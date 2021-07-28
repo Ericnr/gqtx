@@ -18,6 +18,7 @@ import {
   InputFieldMap,
   SubscriptionField,
   SubscriptionObject,
+  AllType,
 } from './types';
 
 type ExtensionsMap = {
@@ -158,9 +159,13 @@ export type Factory<Ctx, TExtensionsMap extends ExtensionsMap> = {
     interfaces?: Interface<Ctx, any>[] | undefined;
     fields: (self: Interface<Ctx, Src | null>) => AbstractField<Ctx, any>[];
   }): Interface<Ctx, Src | null>;
-  List<Src>(ofType: OutputType<Ctx, Src>): OutputType<Ctx, Src[] | null>;
+  List<Src, IsInput extends boolean>(
+    ofType: AllType<Ctx, Src, IsInput>
+  ): AllType<Ctx, Src[] | null, IsInput>;
   ListInput<Src>(ofType: InputType<Src>): InputType<Src[] | null>;
-  NonNull<Src>(ofType: OutputType<Ctx, Src | null>): OutputType<Ctx, Src>;
+  NonNull<Src, IsInput extends boolean>(
+    ofType: AllType<Ctx, Src | null, IsInput>
+  ): AllType<Ctx, Src, IsInput>;
   NonNullInput<Src>(ofType: InputType<Src | null>): InputType<Src>;
   queryType<RootSrc>({
     name,
@@ -466,13 +471,13 @@ export function createTypesFactory<
       obj.fieldsFn = () => fields(obj) as any;
       return obj;
     },
-    List<Src>(
-      ofType: OutputType<Ctx, Src>
-    ): OutputType<Ctx, Array<Src> | null> {
+    List<Src, IsInput extends boolean>(
+      ofType: AllType<Ctx, Src, IsInput>
+    ): AllType<Ctx, Array<Src> | null, IsInput> {
       return {
         kind: 'List',
-        ofType: ofType as any,
-      };
+        ofType: ofType,
+      } as any;
     },
     ListInput<Src>(ofType: InputType<Src>): InputType<Array<Src> | null> {
       return {
@@ -480,13 +485,14 @@ export function createTypesFactory<
         ofType: ofType as any,
       };
     },
-    NonNull<Src>(ofType: OutputType<Ctx, Src | null>): OutputType<Ctx, Src> {
+    NonNull<Src, IsInput extends boolean>(
+      ofType: AllType<Ctx, Src | null, IsInput>
+    ): AllType<Ctx, Src, IsInput> {
       return {
         kind: 'NonNull',
-        ofType: ofType as any,
-      };
+        ofType: ofType,
+      } as any;
     },
-
     NonNullInput<Src>(ofType: InputType<Src | null>): InputType<Src> {
       return {
         kind: 'NonNullInput',

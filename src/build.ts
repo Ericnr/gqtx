@@ -43,7 +43,7 @@ export function buildGraphQLSchema<Ctx, RootSrc>(
 
 export function toGraphQLArgs<Ctx, T>(
   args: ArgMap<T>,
-  typeMap: Map<AllType<Ctx>, graphql.GraphQLType>
+  typeMap: Map<AllType<Ctx, any, true>, graphql.GraphQLType>
 ): graphql.GraphQLFieldConfigArgumentMap {
   const graphqlArgs: graphql.GraphQLFieldConfigArgumentMap = {};
 
@@ -62,7 +62,7 @@ export function toGraphQLArgs<Ctx, T>(
 
 export function toGraphQLSubscriptionObject<Ctx, RootSrc>(
   subscriptionObj: SubscriptionObject<Ctx, RootSrc>,
-  typeMap: Map<AllType<Ctx>, graphql.GraphQLType>
+  typeMap: Map<AllType<Ctx, any, false>, graphql.GraphQLType>
 ): graphql.GraphQLObjectType {
   return new graphql.GraphQLObjectType({
     name: subscriptionObj.name,
@@ -75,7 +75,7 @@ export function toGraphQLSubscriptionObject<Ctx, RootSrc>(
           description: field.description,
           subscribe: field.subscribe,
           resolve: field.resolve,
-          args: toGraphQLArgs(field.args, typeMap),
+          args: toGraphQLArgs(field.args, typeMap as any),
           deprecationReason: field.deprecationReason,
         };
       });
@@ -87,7 +87,7 @@ export function toGraphQLSubscriptionObject<Ctx, RootSrc>(
 
 export function toGraphQLInputType<Ctx>(
   t: InputType<any>,
-  typeMap: Map<AllType<Ctx>, graphql.GraphQLType>
+  typeMap: Map<AllType<Ctx, any, true>, graphql.GraphQLType>
 ): graphql.GraphQLInputType {
   const found = typeMap.get(t);
 
@@ -98,7 +98,7 @@ export function toGraphQLInputType<Ctx>(
   switch (t.kind) {
     case 'Scalar':
     case 'Enum':
-      return toGraphQLOutputType(t, typeMap) as graphql.GraphQLInputType;
+      return toGraphQLOutputType(t, typeMap as any) as graphql.GraphQLInputType;
     case 'NonNullInput':
       return new graphql.GraphQLNonNull(toGraphQLInputType(t.ofType, typeMap));
     case 'ListInput':
@@ -134,7 +134,7 @@ export function toGraphQLInputType<Ctx>(
 
 export function toGraphQLOutputType<Ctx, Src>(
   t: OutputType<Ctx, any>,
-  typeMap: Map<AllType<Ctx>, graphql.GraphQLType>
+  typeMap: Map<AllType<Ctx, any, false>, graphql.GraphQLType>
 ): graphql.GraphQLOutputType {
   const found = typeMap.get(t);
 
@@ -191,7 +191,7 @@ export function toGraphQLOutputType<Ctx, Src>(
               type: toGraphQLOutputType(field.type, typeMap),
               description: field.description,
               resolve: field.resolve,
-              args: toGraphQLArgs(field.args, typeMap),
+              args: toGraphQLArgs(field.args, typeMap as any),
               deprecationReason: field.deprecationReason,
               extensions: field.extensions,
             } as graphql.GraphQLFieldConfig<unknown, Ctx, any>;
@@ -232,7 +232,7 @@ export function toGraphQLOutputType<Ctx, Src>(
               type: toGraphQLOutputType(field.type, typeMap),
               description: field.description,
               deprecationReason: field.deprecationReason,
-              args: field.args && toGraphQLArgs(field.args, typeMap),
+              args: field.args && toGraphQLArgs(field.args, typeMap as any),
             };
           });
 

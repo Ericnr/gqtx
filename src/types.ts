@@ -9,11 +9,13 @@ export type OutputType<Ctx, Src> =
   | ObjectType<Ctx, Src>
   | Union<Ctx, Src>
   | Interface<Ctx, Src>
-  | ListType<Ctx, Src>
-  | NonNullType<Ctx, Src>;
+  | ListType<Ctx, Src, false>
+  | NonNullType<Ctx, Src, false>;
 
-interface ListType<Ctx, Src> extends List<Ctx, OutputType<Ctx, Src>> {}
-interface NonNullType<Ctx, Src> extends NonNull<Ctx, OutputType<Ctx, Src>> {}
+interface ListType<Ctx, Src, IsInput extends boolean>
+  extends List<Ctx, AllType<Ctx, Src, IsInput>> {}
+interface NonNullType<Ctx, Src, IsInput extends boolean>
+  extends NonNull<Ctx, AllType<Ctx, Src, IsInput>> {}
 
 export type InputType<Src> =
   | Scalar<Src>
@@ -22,10 +24,12 @@ export type InputType<Src> =
   | ListInputType<Src>
   | NonNullInputType<Src>;
 
+export type AllType<Ctx, Src, IsInput extends boolean> = IsInput extends true
+  ? InputType<Src>
+  : OutputType<Ctx, Src>;
+
 interface ListInputType<Src> extends ListInput<InputType<Src>> {}
 interface NonNullInputType<Src> extends NonNullInput<InputType<Src>> {}
-
-export type AllType<Ctx> = OutputType<Ctx, any> | InputType<any>;
 
 export type Scalar<Src> =
   | {
