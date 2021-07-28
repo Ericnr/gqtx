@@ -48,9 +48,15 @@ export type RelayConnectionDefinitions<Ctx, T> = {
   connectionType: ObjectType<Ctx, Connection<T>>;
 };
 
-export function createRelayHelpers<Ctx, ExtensionsMap>(t: Factory<Ctx, ExtensionsMap>) {
+export function createRelayHelpers<Ctx, ExtensionsMap>(
+  t: Factory<Ctx, ExtensionsMap>
+) {
   function nodeDefinitions<Src>(
-    idFetcher: (id: string, context: Ctx, info: GraphQLResolveInfo) => Promise<Src> | Src
+    idFetcher: (
+      id: string,
+      context: Ctx,
+      info: GraphQLResolveInfo
+    ) => Promise<Src> | Src
   ) {
     const nodeInterface = t.interfaceType({
       name: 'Node',

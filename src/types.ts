@@ -89,13 +89,15 @@ export type ArgMap<T> = {
 };
 
 export type ArgMapValue<TArg> = TArg extends DefaultArgument<infer Src>
-? Src
+  ? Src
   : TArg extends Argument<infer Src>
-  ? Src extends null ? Maybe<Src> : Src
-: never
+  ? Src extends null
+    ? Maybe<Src>
+    : Src
+  : never;
 
 export type TOfArgMap<TArgMap> = {
-  [K in keyof TArgMap]: ArgMapValue<TArgMap[K]>
+  [K in keyof TArgMap]: ArgMapValue<TArgMap[K]>;
 };
 
 export type Field<Ctx, Src, Out, TArg extends object = {}> = {
@@ -130,7 +132,11 @@ export type ObjectType<Ctx, Src> = {
   deprecationReason?: string;
   interfaces: Array<Interface<Ctx, any>>;
   fieldsFn: () => Array<Field<Ctx, Src, any, any>>;
-  isTypeOf?: (src: any, ctx: Ctx, info: graphql.GraphQLResolveInfo) => boolean | Promise<boolean>;
+  isTypeOf?: (
+    src: any,
+    ctx: Ctx,
+    info: graphql.GraphQLResolveInfo
+  ) => boolean | Promise<boolean>;
   extensions?: Record<string, any>;
 };
 
@@ -204,6 +210,6 @@ export type Schema<Ctx, RootSrc = undefined> = {
   query: ObjectType<Ctx, RootSrc>;
   mutation?: ObjectType<Ctx, RootSrc>;
   subscription?: SubscriptionObject<Ctx, RootSrc>;
-  types?: ObjectType<Ctx, any>[]
-  directives?: graphql.GraphQLDirective[]
+  types?: ObjectType<Ctx, any>[];
+  directives?: graphql.GraphQLDirective[];
 };
